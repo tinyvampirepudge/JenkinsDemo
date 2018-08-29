@@ -18,10 +18,10 @@ android {
     signingConfigs {
         //存储在根目录的gradle.properties文件中，更安全。
         release {
-            storeFile file(KEY_PATH)
-            storePassword KEY_PASS
-            keyAlias ALIAS_NAME
-            keyPassword ALIAS_PASS
+            storeFile file("/Users/tinytongtong/Documents/workspace/keystore/tinytongtong.jks")
+            storePassword "tinytongtong"
+            keyAlias "tinytongtong"
+            keyPassword "tinytongtong"
         }
     }
 
