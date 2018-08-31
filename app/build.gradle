@@ -44,7 +44,7 @@ android {
 
                 if ("true".equals(IS_JENKINS)) {
                     //这个修改输出的APK路径
-                    variant.getPackageApplication().outputDirectory = new File(JENKINS_APP_PATH + "/JenkinsDemo" + "/" + BUILD_TIME)
+                    variant.getPackageApplication().outputDirectory = new File(JENKINS_APP_PATH)
                     variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
                         //这个修改输出APK的文件名
                         apkData.outputFileName = "JenkinsTest_v${defaultConfig.versionName}_${variant.productFlavors[0].name}" +
