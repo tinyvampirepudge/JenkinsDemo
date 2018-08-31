@@ -49,7 +49,7 @@ android {
                         variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
                             //这个修改输出APK的文件名
                             apkData.outputFileName = "JenkinsTest_v${defaultConfig.versionName}_${upperPrefixChar(variant.productFlavors[0].name)}" +
-                                    "_${upperPrefixChar(variant.buildType.name)}" + "_${getDate()}.apk"
+                                    "_${upperPrefixChar(variant.buildType.name)}" + "_${BUILD_TIME}.apk"
                         }
                     } catch (Exception e) {
                         e.printStackTrace()
@@ -100,7 +100,7 @@ dependencies {
 
 def getDate() {
     def date = new Date()
-    def formattedDate = date.format('yyyy-MM-dd-HH-mm')
+    def formattedDate = date.format('yyyy-MM-dd-HH-mm', TimeZone.getTimeZone("UTC"))
     return formattedDate
 }
 
