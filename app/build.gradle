@@ -54,6 +54,9 @@ android {
                     } catch (Exception e) {
                         e.printStackTrace()
                     }
+                    println "IS_JENKINS:" + IS_JENKINS
+                    println "JENKINS_APP_PATH:" + JENKINS_APP_PATH
+                    println "BUILD_TIME:" + BUILD_TIME
                 } else {
                     //这个修改输出的APK路径
                     if (variant.buildType.name != "debug") {//防止AS无法安装debug包(apk)
