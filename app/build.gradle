@@ -48,8 +48,8 @@ android {
                         variant.getPackageApplication().outputDirectory = new File(JENKINS_APP_PATH)
                         variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
                             //这个修改输出APK的文件名
-                            apkData.outputFileName = "JenkinsTest_v${defaultConfig.versionName}_${variant.productFlavors[0].name}" +
-                                    "_${getGitRevision()}" + "_${getDate()}.apk"
+                            apkData.outputFileName = "JenkinsTest_v${defaultConfig.versionName}_${upperPrefixChar(variant.productFlavors[0].name)}" +
+                                    "_${upperPrefixChar(variant.buildTypes.name)}" + "_${getGitRevision()}" + "_${getDate()}.apk"
                         }
                     } catch (Exception e) {
                         e.printStackTrace()
@@ -107,4 +107,17 @@ def getDate() {
 
 def getGitRevision() {
     return "git rev-parse --short HEAD".execute().text.trim()
+}
+
+/**
+ * 修改为首字母大写
+ * @param s
+ * @return
+ */
+def upperPrefixChar(String s) {
+    if (s == null) {
+        return s
+    }
+    String prefix = s.substring(0, 1).toUpperCase()
+    return prefix + s.substring(1)
 }
