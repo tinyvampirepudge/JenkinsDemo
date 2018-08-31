@@ -11,8 +11,15 @@ android {
         minSdkVersion 15
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName APP_VERSION
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        //为flavor设置一个版本，命名是随意的
+        flavorDimensions "jenkins"
+
+        //多渠道打包的配置，除了下面的，如果没有这句代码的话，apk的输出位置会在build/outputs/apk下面
+        // 默认是umeng的渠道
+        manifestPlaceholders = [UMENG_CHANNEL_VALUE: "wap"]
     }
 
     signingConfigs {
@@ -26,20 +33,71 @@ android {
     }
 
     buildTypes {
+        debug {}
         release {
             minifyEnabled false
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            //打包好的文件进行输出，修改文件名称的操作在下面进行。
+            applicationVariants.all { variant ->
+
+                if ("true".equals(IS_JENKINS)) {
+                    //这个修改输出的APK路径
+                    variant.getPackageApplication().outputDirectory = new File(JENKINS_APP_PATH + "/JenkinsDemo" + "/" + BUILD_TIME)
+                    variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
+                        //这个修改输出APK的文件名
+                        apkData.outputFileName = "JenkinsTest_v${defaultConfig.versionName}_${variant.productFlavors[0].name}" +
+                                "_${getGitRevision()}" + "_${getDate()}.apk"
+                    }
+                } else {
+                    //这个修改输出的APK路径
+                    if (variant.buildType.name != "debug") {//防止AS无法安装debug包(apk)
+                        variant.getPackageApplication().outputDirectory = new File(project.rootDir.absolutePath + "/apk")
+                    }
+                    variant.getPackageApplication().outputScope.apkDatas.forEach { apkData ->
+                        //这个修改输出APK的文件名
+                        apkData.outputFileName = "JenkinsTest_v${defaultConfig.versionName}_${variant.productFlavors[0].name}" +
+                                "_${getGitRevision()}" + "_${getDate()}.apk"
+                    }
+                }
+            }
         }
+    }
+
+    // 友盟多渠道打包
+    productFlavors {
+        //渠道名的闭包中可以覆写defaultConfig中的任何一个属性。
+        xiaomi {}
+        wandoujia {}
+    }
+
+    productFlavors.all { flavor ->
+        flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
+    }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:28.0.0-rc01'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+}
+
+def getDate() {
+    def date = new Date()
+    def formattedDate = date.format('yyyy-MM-dd-HH-mm')
+    return formattedDate
+}
+
+
+def getGitRevision() {
+    return "git rev-parse --short HEAD".execute().text.trim()
 }
